@@ -11,8 +11,8 @@ public class BookTest {
 	@Test
 	public void testBook() {
 		// String title, String name, String description, String genre
-		assertEquals(b1.toString(), "Book [title=title1, Name=name here, description=descriptions here, genre=genreListed]");
-		assertEquals(b2.toString(), "Book [title=bookName, Name=testing name, description=cool description, genre=theGenre]");
+		assertEquals(b1.toString(), "Book [title=title1, Name = name here, description = descriptions here, genre = genreListed]");
+		assertEquals(b2.toString(), "Book [title=bookName, Name = testing name, description = cool description, genre = theGenre]");
 	}
 	
 	@Test
