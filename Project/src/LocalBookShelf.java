@@ -2,6 +2,13 @@ import java.util.ArrayList;
 
 public class LocalBookShelf implements BookShelf {
 
+	private int shelfSize; 
+	
+	public LocalBookShelf() {
+		ArrayList<Book> LocalBookShelf = new ArrayList<Book>();
+		shelfSize = 0;
+	}
+	
 	@Override
 	public void addBook(Book book) {
 		// TODO Auto-generated method stub
