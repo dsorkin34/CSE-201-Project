@@ -21,7 +21,7 @@ public interface BookShelf {
 	 * 
 	 * @param inputFile The input CSV file
 	 */
-	public void importCSV(File inputFile);
+	public void addFromCSV(File inputFile);
 
 	/**
 	 * Remove a Book from the BookShelf base on its ISBN

@@ -5,31 +5,44 @@ import java.util.Collections;
 public class LocalBookShelf implements BookShelf {
 	// ======================= Property
 	private final ArrayList<Book> bookShelf;
+	private int size;
 
 	// ======================= Constructor
 	// The Main Constructor
 	public LocalBookShelf() {
 		bookShelf = new ArrayList<Book>();
+		size = 0;
+	} // end constructor
+
+	// Constructorc using a CSV file
+	public LocalBookShelf(File inputFile) {
+		bookShelf = new ArrayList<Book>();
+		size = 0;
+		// TODO Auto-generated method stub
 	} // end constructor
 
 	// ======================= Method
 	@Override
 	public boolean addBook(Book book) {
-		if (!bookShelf.contains(book))
-			return bookShelf.add(book);
-		return false;
+		boolean isAdded = false;
+		if (!bookShelf.contains(book)) {
+			isAdded = bookShelf.add(book);
+			size++;
+		}
+		return isAdded;
 	} // end addBook
 
 	@Override
-	public void importCSV(File inputFile) {
+	public void addFromCSV(File inputFile) {
 		// Not implemented, need dissucssion
 		// TODO Auto-generated method stub
-	} // end importCSV
+	} // end addFromCSV
 
 	@Override
 	public Book removeBook(String key) {
 		// Not implemented, need dissucssion
 		// TODO Auto-generated method stub
+		size--;
 		return null;
 	} // end removeBook
 
@@ -98,7 +111,7 @@ public class LocalBookShelf implements BookShelf {
 
 	@Override
 	public int size() {
-		return bookShelf.size();
+		return size;
 	} // end size
 
 	/**
@@ -117,4 +130,4 @@ public class LocalBookShelf implements BookShelf {
 		} // end if
 	} // end sortBy
 
-}
+} // end LocalBookShelf
