@@ -11,5 +11,5 @@ public enum SortingCriteria {
 	GENRE, 
 	GENRE_REVERSE, 
 	RATING, 
-	RATING_REVERSE;
+	RATINGREVERSE;
 }
