@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 
 /*
  * Author: Nuo XU
@@ -17,6 +19,9 @@ public class Book {
 	private String lName; // The last name of the author
 	private String description; // The description of the book, must be paragraph
 	private String genre; // The genre of the book
+	private double rating; // The average rating score based on a 0 to 5 scale
+	private int numOfRating; // The number of ratings
+	private HashMap<String, String> comments; // HashMap of <userName, comment> pairs
 
 	// ======================= Constructor
 	/**
@@ -37,6 +42,9 @@ public class Book {
 		this.lName = name.split("\\s")[1];
 		this.description = description;
 		this.genre = genre;
+		this.rating = 0;
+		this.numOfRating = 0;
+		this.comments = new HashMap<>();
 	} // end constructor
 
 	// ======================= Method
@@ -48,11 +56,14 @@ public class Book {
 	@Override
 	public String toString() {
 		return	"Book\n" + 
-				"ISBN   = " + ISBN   + "\n"+
+				"ISBN        = " + ISBN        + "\n"+
 				"title       = " + title       + "\n"+
-				"name        = " + getAuthor()   + "\n"+
+				"name        = " + getAuthor() + "\n"+
 				"description = " + description + "\n"+
-				"genre       = " + genre       + "\n";
+				"genre       = " + genre       + "\n"+
+				"Rating      = " + rating      + "\n"+
+				"Rating Count= " + numOfRating + "\n"+
+				"Comments    = " + comments    + "\n";
 	} // end toString
 
 	/**
@@ -202,5 +213,46 @@ public class Book {
 	public String getGenre() {
 		return genre;
 	} // end getGenre
+
+		/**
+	 * Get the rating of a Book object
+	 * 
+	 * @return The rating of a Book
+	 */
+	public double getRating() {
+		return rating;
+	} // end getRating
+	
+	/**
+	 * Add a new rating to the overall rating
+	 * 
+	 * @param newRating genre of a Book
+	 */
+	public void addRating(double newRating) {
+		rating = (rating * numOfRating + newRating) / (numOfRating + 1);
+		numOfRating++;
+	} // end addRating
+
+	
+	/**
+	 * Get the copy of HashMap of comments of a Book object
+	 * 
+	 * @return The HashMap of comments
+	 */
+	public HashMap<String, String> getComments() {
+		@SuppressWarnings("unchecked")
+		HashMap<String, String> ret = (HashMap<String, String>)comments.clone();
+		return ret;
+	} // end getComments
+	
+	/**
+	 * Add a new comment to the HashMao of comments
+	 * 
+	 * @param userName userName of the commenter
+	 * @param content the content of the comment
+	 */
+	public void addComment(String userName, String content) {
+		comments.put(userName, content);
+	} // end addComment
 
 } // end Book class

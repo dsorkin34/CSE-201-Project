@@ -12,12 +12,15 @@ public interface BookShelf {
 	public boolean addBook(Book book);
 
 	/**
-	 * Add multiple Books from a CSV file to the BookShelf, books with the same ISBN
-	 * is not allowed. One book per row The first row will be ignored as a header
+	 * Add multiple Books from a CSV file to the BookShelf. 
+	 * One book per row.
 	 * The format: [ISBN, title, author's name(first name and last name seperated by
-	 * a space), description, genre] Planning to add auto-header-detect feature
-	 * Coloumns after 5 will be igored Rows has the same ISBN with previous rows
-	 * will be ignored
+	 * a space), description, genre].
+	 * The first row will be ignored as a header
+	 * Coloumns after 5 will be igored. 
+	 * Rows has the same ISBN with previous rows will be ignored	 
+	 * 
+	 * Planning to add auto-header-detect feature.
 	 * 
 	 * @param inputFile The input CSV file
 	 */
@@ -28,16 +31,18 @@ public interface BookShelf {
 	 * 
 	 * @param key The ISBN of the book
 	 * @return the removed book, return null if the book is not exsit
+	 * @throws Exception
 	 */
-	public Book removeBook(String key);
+	public Book removeBook(String key) throws Exception;
 
 	/**
 	 * Get a Book from the BookShelf base on its ISBN
 	 * 
 	 * @param key The ISBN of the book
 	 * @return the book, return null if the book is not exsit
+	 * @throws Exception
 	 */
-	public Book getBook(String key);
+	public Book getBook(String key) throws Exception;
 
 	/**
 	 * Search for Book with the keyword in a selected field(Title, Author, Genre,

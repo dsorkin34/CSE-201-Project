@@ -1,6 +1,9 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Scanner;
 
 public class LocalBookShelf implements BookShelf {
 	// ======================= Property
@@ -16,9 +19,8 @@ public class LocalBookShelf implements BookShelf {
 
 	// Constructorc using a CSV file
 	public LocalBookShelf(File inputFile) {
-		bookShelf = new ArrayList<Book>();
-		size = 0;
-		// TODO Auto-generated method stub
+		this();
+		addFromCSV(inputFile);
 	} // end constructor
 
 	// ======================= Method
@@ -34,23 +36,44 @@ public class LocalBookShelf implements BookShelf {
 
 	@Override
 	public void addFromCSV(File inputFile) {
-		// Not implemented, need dissucssion
-		// TODO Auto-generated method stub
+		Scanner readIn;
+		String[] currentAttributes = {};
+		Book currentBook;
+		try {
+			readIn = new Scanner(inputFile);
+			while (readIn.hasNextLine()) {
+				currentAttributes = readIn.nextLine().split(",");
+				assert currentAttributes.length == 5;
+				currentBook = new Book(currentAttributes[0], currentAttributes[1], currentAttributes[2],
+						currentAttributes[3], currentAttributes[4]);
+				addBook(currentBook);
+				size++;
+			}
+			readIn.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	} // end addFromCSV
 
 	@Override
-	public Book removeBook(String key) {
-		// Not implemented, need dissucssion
-		// TODO Auto-generated method stub
-		size--;
-		return null;
+	public Book removeBook(String key) throws Exception {
+		Book removedBook = getBook(key);
+		bookShelf.remove(removedBook);
+		return removedBook;
 	} // end removeBook
 
 	@Override
-	public Book getBook(String key) {
-		// Not implemented, need dissucssion
-		// TODO Auto-generated method stub
-		return null;
+	public Book getBook(String key) throws Exception {
+		ArrayList<Book> possibleBooks = searchBook(SearchingField.TITLE, key, SortingCriteria.AUTHOR);
+		if (possibleBooks.size() == 0) {
+			System.out.println("Book not found");
+			return null;
+		} else if (possibleBooks.size() == 1) {
+			Book targetBook = possibleBooks.get(0);
+			return targetBook;
+		} else {
+			throw new Exception("Duplicate Books exist.");
+		}
 	} // end getBook
 
 	@Override
