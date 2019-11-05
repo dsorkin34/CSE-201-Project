@@ -69,17 +69,6 @@ public class GUI extends JFrame {
 		SpringLayout sl_contentPane = new SpringLayout();
 		contentPane.setLayout(sl_contentPane);
 		
-		JLabel lblPagebypage = new JLabel("PageByPage");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblPagebypage, 5, SpringLayout.NORTH, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.WEST, lblPagebypage, 26, SpringLayout.WEST, contentPane);
-		lblPagebypage.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		contentPane.add(lblPagebypage);
-		
-		JLabel lblSahara = new JLabel("By Sahara");
-		sl_contentPane.putConstraint(SpringLayout.NORTH, lblSahara, 35, SpringLayout.NORTH, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.WEST, lblSahara, 52, SpringLayout.WEST, contentPane);
-		contentPane.add(lblSahara);
-		
 		JButton btnMeetOurDevelopers = new JButton("Meet Our Developers");
 		sl_contentPane.putConstraint(SpringLayout.NORTH, btnMeetOurDevelopers, 56, SpringLayout.NORTH, contentPane);
 		sl_contentPane.putConstraint(SpringLayout.WEST, btnMeetOurDevelopers, 5, SpringLayout.WEST, contentPane);
@@ -126,68 +115,132 @@ public class GUI extends JFrame {
 			}
 		});
 		contentPane.add(btnSearch);
+		JPanel sortFilterPanel = addFilterSortSection();
+		sl_contentPane.putConstraint(SpringLayout.NORTH, sortFilterPanel, 19, SpringLayout.SOUTH, btnMeetOurDevelopers);
+		sl_contentPane.putConstraint(SpringLayout.WEST, sortFilterPanel, 0, SpringLayout.WEST, btnMeetOurDevelopers);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, sortFilterPanel, -15, SpringLayout.SOUTH, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.EAST, sortFilterPanel, -830, SpringLayout.EAST, contentPane);
+		sortFilterPanel.setBackground(Color.WHITE);
+		sortFilterPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		contentPane.add(sortFilterPanel);
+		JScrollPane scrollPane = new JScrollPane(createBookViewSection());
+		sl_contentPane.putConstraint(SpringLayout.NORTH, scrollPane, 19, SpringLayout.SOUTH, btnContactUs);
+		sl_contentPane.putConstraint(SpringLayout.WEST, scrollPane, 10, SpringLayout.EAST, sortFilterPanel);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, scrollPane, -15, SpringLayout.SOUTH, contentPane);
+		sl_contentPane.putConstraint(SpringLayout.EAST, scrollPane, -26, SpringLayout.EAST, contentPane);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		contentPane.add(scrollPane);
 		
-		JPanel panel = new JPanel();
-		sl_contentPane.putConstraint(SpringLayout.EAST, panel, -73, SpringLayout.EAST, btnContactUs);
-		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		sl_contentPane.putConstraint(SpringLayout.NORTH, panel, 26, SpringLayout.SOUTH, btnMeetOurDevelopers);
-		sl_contentPane.putConstraint(SpringLayout.WEST, panel, 15, SpringLayout.WEST, contentPane);
-		sl_contentPane.putConstraint(SpringLayout.SOUTH, panel, 345, SpringLayout.SOUTH, btnMeetOurDevelopers);
-		contentPane.add(panel);
+	}
+	private JPanel addFilterSortSection() {
+		JPanel sortFilterPanel = new JPanel();
 		SpringLayout sl_panel = new SpringLayout();
-		panel.setLayout(sl_panel);
+		sortFilterPanel.setLayout(sl_panel);
 		
 		JLabel lblSortBy = new JLabel("Sort By");
-		lblSortBy.setFont(new Font("Tahoma", Font.BOLD, 15));
-		sl_panel.putConstraint(SpringLayout.NORTH, lblSortBy, 6, SpringLayout.NORTH, panel);
-		sl_panel.putConstraint(SpringLayout.WEST, lblSortBy, 10, SpringLayout.WEST, panel);
-		sl_panel.putConstraint(SpringLayout.SOUTH, lblSortBy, 28, SpringLayout.NORTH, panel);
-		sl_panel.putConstraint(SpringLayout.EAST, lblSortBy, 70, SpringLayout.WEST, panel);
-		panel.add(lblSortBy);
+		lblSortBy.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
+		sl_panel.putConstraint(SpringLayout.NORTH, lblSortBy, 6, SpringLayout.NORTH, sortFilterPanel);
+		sl_panel.putConstraint(SpringLayout.WEST, lblSortBy, 10, SpringLayout.WEST, sortFilterPanel);
+		sl_panel.putConstraint(SpringLayout.SOUTH, lblSortBy, 28, SpringLayout.NORTH, sortFilterPanel);
+		sl_panel.putConstraint(SpringLayout.EAST, lblSortBy, 70, SpringLayout.WEST, sortFilterPanel);
+		sortFilterPanel.add(lblSortBy);
 		ButtonGroup sort = new ButtonGroup();
 		JRadioButton author = new JRadioButton("Author");
+		author.setBackground(Color.WHITE);
 		sl_panel.putConstraint(SpringLayout.NORTH, author, 6, SpringLayout.SOUTH, lblSortBy);
 		sl_panel.putConstraint(SpringLayout.WEST, author, 0, SpringLayout.WEST, lblSortBy);
-		panel.add(author);
+		sortFilterPanel.add(author);
 		
 		JRadioButton title = new JRadioButton("Title");
+		title.setBackground(Color.WHITE);
 		sl_panel.putConstraint(SpringLayout.NORTH, title, 6, SpringLayout.SOUTH, author);
 		sl_panel.putConstraint(SpringLayout.WEST, title, 0, SpringLayout.WEST, lblSortBy);
-		panel.add(title);
+		sortFilterPanel.add(title);
 		
 		JRadioButton rating = new JRadioButton("Rating");
+		rating.setBackground(Color.WHITE);
 		sl_panel.putConstraint(SpringLayout.NORTH, rating, 6, SpringLayout.SOUTH, title);
 		sl_panel.putConstraint(SpringLayout.WEST, rating, 0, SpringLayout.WEST, lblSortBy);
 		sl_panel.putConstraint(SpringLayout.WEST, title, 0, SpringLayout.WEST, lblSortBy);
-		panel.add(rating);
+		sortFilterPanel.add(rating);
 		sort.add(author);
 		sort.add(title);
 		sort.add(rating);
 		
 		JLabel lblFilter = new JLabel("Filter");
-		sl_panel.putConstraint(SpringLayout.WEST, lblFilter, 12, SpringLayout.WEST, panel);
+		sl_panel.putConstraint(SpringLayout.NORTH, lblFilter, 8, SpringLayout.SOUTH, rating);
+		sl_panel.putConstraint(SpringLayout.WEST, lblFilter, 12, SpringLayout.WEST, sortFilterPanel);
 		sl_panel.putConstraint(SpringLayout.EAST, lblFilter, 0, SpringLayout.EAST, lblSortBy);
-		lblFilter.setFont(new Font("Tahoma", Font.BOLD, 15));
-		panel.add(lblFilter);
+		lblFilter.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
+		sortFilterPanel.add(lblFilter);
 		
 		JLabel lblRating = new JLabel("Rating");
 		sl_panel.putConstraint(SpringLayout.NORTH, lblRating, 9, SpringLayout.SOUTH, lblFilter);
 		sl_panel.putConstraint(SpringLayout.WEST, lblRating, 0, SpringLayout.WEST, lblSortBy);
-		lblRating.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		panel.add(lblRating);
+		lblRating.setFont(new Font("Tahoma", Font.BOLD, 14));
+		sortFilterPanel.add(lblRating);
 		
-		JComboBox<String> ratingComboBox = new JComboBox<String>();
-		sl_panel.putConstraint(SpringLayout.SOUTH, lblFilter, -5, SpringLayout.NORTH, ratingComboBox);
-		sl_panel.putConstraint(SpringLayout.NORTH, ratingComboBox, 32, SpringLayout.SOUTH, rating);
-		sl_panel.putConstraint(SpringLayout.WEST, ratingComboBox, 55, SpringLayout.WEST, panel);
-		sl_panel.putConstraint(SpringLayout.EAST, ratingComboBox, -8, SpringLayout.EAST, panel);
-		ratingComboBox.addItem("");
-		ratingComboBox.addItem("* - One Star");
-		ratingComboBox.addItem("** - Two Star");
-		ratingComboBox.addItem("*** - Three Star");
-		ratingComboBox.addItem("**** - Four Star");
-		ratingComboBox.addItem("***** - Five Star");
-		panel.add(ratingComboBox);
+		JCheckBox chckbxOneStar = new JCheckBox("One Star *");
+		chckbxOneStar.setBackground(Color.WHITE);
+		sl_panel.putConstraint(SpringLayout.NORTH, chckbxOneStar, 6, SpringLayout.SOUTH, lblRating);
+		sl_panel.putConstraint(SpringLayout.WEST, chckbxOneStar, 0, SpringLayout.WEST, lblSortBy);
+		sortFilterPanel.add(chckbxOneStar);
+		
+		JCheckBox chckbxTwoStar = new JCheckBox("Two Star **");
+		chckbxTwoStar.setBackground(Color.WHITE);
+		sl_panel.putConstraint(SpringLayout.NORTH, chckbxTwoStar, 6, SpringLayout.SOUTH, chckbxOneStar);
+		sl_panel.putConstraint(SpringLayout.WEST, chckbxTwoStar, 0, SpringLayout.WEST, lblSortBy);
+		sortFilterPanel.add(chckbxTwoStar);
+		
+		JCheckBox chckbxThreeStar = new JCheckBox("Three Star ***");
+		chckbxThreeStar.setBackground(Color.WHITE);
+		sl_panel.putConstraint(SpringLayout.NORTH, chckbxThreeStar, 6, SpringLayout.SOUTH, chckbxTwoStar);
+		sl_panel.putConstraint(SpringLayout.WEST, chckbxThreeStar, 0, SpringLayout.WEST, lblSortBy);
+		sortFilterPanel.add(chckbxThreeStar);
+		
+		JCheckBox chckbxFourStar = new JCheckBox("Four Star ****");
+		chckbxFourStar.setBackground(Color.WHITE);
+		sl_panel.putConstraint(SpringLayout.NORTH, chckbxFourStar, 6, SpringLayout.SOUTH, chckbxThreeStar);
+		sl_panel.putConstraint(SpringLayout.WEST, chckbxFourStar, 0, SpringLayout.WEST, lblSortBy);
+		sortFilterPanel.add(chckbxFourStar);
+		
+		JCheckBox chckbxFiveStar = new JCheckBox("Five Star *****");
+		chckbxFiveStar.setBackground(Color.WHITE);
+		sl_panel.putConstraint(SpringLayout.NORTH, chckbxFiveStar, 6, SpringLayout.SOUTH, chckbxFourStar);
+		sl_panel.putConstraint(SpringLayout.WEST, chckbxFiveStar, 0, SpringLayout.WEST, lblSortBy);
+		sortFilterPanel.add(chckbxFiveStar);
+		return sortFilterPanel;
+		
+	}
+	private JPanel createBookViewSection() {
+		
+		Book test = new Book("The Hungry Catepillar","Greg, Crawford","It's a good book, that talks about a lot of differne things. blahblahblahblahblahblahblahblahblah","Horror");
+		
+		System.out.println(test.toString());
+		
+		JPanel menu = new JPanel();
+		menu.setBackground(Color.WHITE);
+		menu.setLayout(new GridLayout(10,3));
+		JPanel example = createBookPanel(test);
+		JPanel example1 = createBookPanel(test);
+		JPanel example2 = createBookPanel(test);
+		menu.add(example);
+		menu.add(example1);
+		menu.add(example2);
+		return menu;
+	}
+	private static JPanel createBookPanel(Book newBook) {
+		JPanel bookPanel = new JPanel(new GridLayout(3,1));
+		JLabel bookLabel = new JLabel(newBook.getTitle());
+		JLabel bookAuthor = new JLabel("Author: "+newBook.getfName()+" "+newBook.getlName());
+		JLabel bookDescription = new JLabel("Description: \n "+newBook.getDescription());
+		bookPanel.add(bookLabel);
+		bookPanel.add(bookAuthor);
+		bookPanel.add(bookDescription);
+		bookPanel.setBackground(Color.white);
+		bookPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		return bookPanel;
 	}
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
