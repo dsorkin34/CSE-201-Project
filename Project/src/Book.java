@@ -226,10 +226,12 @@ public class Book {
 	 * Add a new rating to the overall rating
 	 * 
 	 * @param newRating genre of a Book
+	 * @return True if successful, else if
 	 */
-	public void addRating(double newRating) {
+	public boolean addRating(double newRating) {
 		rating = (rating * numOfRating + newRating) / (numOfRating + 1);
 		numOfRating++;
+		return true;
 	} // end addRating
 
 	
@@ -249,9 +251,11 @@ public class Book {
 	 * 
 	 * @param userName userName of the commenter
 	 * @param content the content of the comment
+	 * @return True if successful, else false
 	 */
-	public void addComment(String userName, String content) {
+	public boolean addComment(String userName, String content) {
 		comments.put(userName, content);
+		return true;
 	} // end addComment
 
 } // end Book class
