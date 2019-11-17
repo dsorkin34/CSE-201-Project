@@ -83,16 +83,13 @@ class LocalBookShelfTest {
 		try {
 			assertEquals(b1, bookShelf4.getBook("Cliff"));
 		} catch (Exception e) {
-			
 			e.printStackTrace();
 		}
 		try {
 			assertEquals(b2, bookShelf4.getBook("Great"));
 		} catch (Exception e) {
-			
 			e.printStackTrace();
 		}
-
 	}
 	
 	@Test
@@ -110,7 +107,6 @@ class LocalBookShelfTest {
 				bookShelf1.addBook(b3);
 				bookShelf1.addBook(b4);
 				
-				// Show in arrayList
 				// bookShelf1.toArrayList();
 				
 				// Mix up order and see if it still shows up 
@@ -121,6 +117,11 @@ class LocalBookShelfTest {
 				
 				// Show the arrayList
 				// bookShelf2.toArrayList();
+				
+		/*
+		 * No longer need toArrayList test 
+		 * Method is not in LocalBookShelf Class 
+		 */
 	}
 
 	@Test
