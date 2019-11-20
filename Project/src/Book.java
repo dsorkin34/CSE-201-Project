@@ -224,8 +224,9 @@ public class Book {
 	
 	/**
 	 * Add a new rating to the overall rating
+	 * DO NOT USE THIS IN SQL BOOKSHELF
 	 * 
-	 * @param newRating genre of a Book
+	 * @param newRating the new user rating of a Book
 	 * @return True if successful, else if
 	 */
 	public boolean addRating(double newRating) {
@@ -234,9 +235,18 @@ public class Book {
 		return true;
 	} // end addRating
 
-	
+	/**
+	 * Set the overall rating
+	 * 
+	 * @param score the average score of a Book
+	 */
+	public void setRating(double score){
+		this.rating = score;
+	}
+
 	/**
 	 * Get the copy of HashMap of comments of a Book object
+	 * DO NOT USE THIS IN SQL BOOKSHELF
 	 * 
 	 * @return The HashMap of comments
 	 */
@@ -248,6 +258,7 @@ public class Book {
 	
 	/**
 	 * Add a new comment to the HashMao of comments
+	 * DO NOT USE THIS IN SQL BOOKSHELF
 	 * 
 	 * @param userName userName of the commenter
 	 * @param content the content of the comment
