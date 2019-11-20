@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
@@ -53,14 +55,36 @@ public class LocalBookShelf implements BookShelf {
 			e.printStackTrace();
 		}
 	} // end addFromCSV
-
+	
+	public void createCSVFile(String outputFile) throws IOException {
+		FileWriter csvWriter = new FileWriter(outputFile+".csv");
+		for(Book input: bookShelf) {
+			csvWriter.append(input.getISBN());
+			csvWriter.append(",");
+			csvWriter.append(input.getTitle());
+			csvWriter.append(",");
+			csvWriter.append(input.getAuthor());
+			csvWriter.append(",");
+			csvWriter.append(input.getDescription());
+			csvWriter.append(",");
+			csvWriter.append(input.getGenre());
+			csvWriter.append("\n");
+		}
+		csvWriter.flush();
+		csvWriter.close();
+	}// end createCSVFile
+	
 	@Override
 	public Book removeBook(String key) throws Exception {
 		Book removedBook = getBook(key);
 		bookShelf.remove(removedBook);
 		return removedBook;
 	} // end removeBook
-
+	
+	public Book getBooks(int index) {
+		return bookShelf.get(index);
+	}// end getBooks
+	
 	@Override
 	public Book getBook(String key) throws Exception {
 		ArrayList<Book> possibleBooks = searchBook(SearchingField.ISBN, key, SortingCriteria.AUTHOR);
