@@ -18,7 +18,7 @@ public enum SortingCriteria {
 		this.name = name;
 	}
 
-	public String SortName(){
+	public String sortingCriteria(){
 		return name;
 	}
 }

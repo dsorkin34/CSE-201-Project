@@ -15,7 +15,7 @@ public class SQLBookShelf implements BookShelf {
     String password = "15201906221";
     String jdbcUrl = String.format(
             "jdbc:mysql://%s/%s?cloudSqlInstance=%s"
-                    + "&socketFactory=com.google.cloud.sql.mysql.SocketFactory&useSSL=false",
+                    + "&useSSL=false",
 			IP_of_instance, databaseName, instanceConnectionName);
 	Connection connection;
     //private final ArrayList<Book> bookShelf;
@@ -62,7 +62,7 @@ public class SQLBookShelf implements BookShelf {
 		try {
 			readIn = new Scanner(inputFile);
 			while (readIn.hasNextLine()) {
-				currentAttributes = readIn.nextLine().split(",");
+				currentAttributes = readIn.nextLine().split(";");
 				assert currentAttributes.length == 5;
 				currentBook = new Book(currentAttributes[0], currentAttributes[1], currentAttributes[2],
 						currentAttributes[3], currentAttributes[4]);
@@ -113,7 +113,7 @@ public class SQLBookShelf implements BookShelf {
 																			"FROM book, rating "+
 																			"WHERE book.ISBN = rating.ISBN "+
 																			"GROUP BY ISBN" +
-																			"ORDER BY %s;",sortBy.SortName()));
+																			"ORDER BY %s;",sortBy.sortingCriteria()));
 				while(resultSet.next()){
 					Book b = new Book(resultSet.getString(1), resultSet.getString(2), 
 					resultSet.getString(3) + " " +resultSet.getString(4), 
@@ -138,7 +138,8 @@ public class SQLBookShelf implements BookShelf {
 																			"description LIKE \"%%s%\" OR" +
 																			"genre       LIKE \"%%s%\" )" +
 																			"GROUP BY ISBN" +
-																			"ORDER BY %s;",sortBy.SortName()));
+																			"ORDER BY %s;",keyword, keyword, keyword,
+																			keyword, keyword, keyword, sortBy.sortingCriteria()));
 				while(resultSet.next()){
 					Book b = new Book(resultSet.getString(1), resultSet.getString(2), 
 					resultSet.getString(3) + " " +resultSet.getString(4), 
@@ -150,35 +151,23 @@ public class SQLBookShelf implements BookShelf {
 			}
 			return ret;
 		} // end if
-
-		if (field.equals(SearchingField.ISBN)) {
-			for (Book b : bookShelf) {
-				if (b.getISBN().contains(keyword))
-					ret.add(b.clone());
-			} // end for
-		} else if (field.equals(SearchingField.TITLE)) {
-			for (Book b : bookShelf) {
-				if (b.getTitle().contains(keyword))
-					ret.add(b.clone());
-			} // end for
-		} else if (field.equals(SearchingField.AUTHOR)) {
-			for (Book b : bookShelf) {
-				if (b.getAuthor().contains(keyword))
-					ret.add(b.clone());
-			} // end for
-		} else if (field.equals(SearchingField.DISCRIPTION)) {
-			for (Book b : bookShelf) {
-				if (b.getDescription().contains(keyword))
-					ret.add(b.clone());
-			} // end for
-		} else if (field.equals(SearchingField.GENRE)) {
-			for (Book b : bookShelf) {
-				if (b.getGenre().contains(keyword))
-					ret.add(b.clone());
-			} // end for
-		} else {
-		} // end if
-		sortBy(ret, sortBy);
+		
+		try (Statement statement = connection.createStatement()) {
+			ResultSet resultSet = statement.executeQuery(String.format("SELECT ISBN, title, fName, lName, description, genre, avg(score) "+ 
+																		"FROM book, rating "+
+																		"WHERE book.ISBN = rating.ISBN AND ( "+
+																		"%s       LIKE \"%%s%\" )" +
+																		"GROUP BY ISBN" +
+																		"ORDER BY %s;",field.searchingfield() ,keyword,sortBy.sortingCriteria()));
+			while(resultSet.next()){
+				Book b = new Book(resultSet.getString(1), resultSet.getString(2), 
+				resultSet.getString(3) + " " +resultSet.getString(4), 
+				resultSet.getString(5), resultSet.getString(6));
+				ret.add(b);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return ret;
 	} // end search
 
