@@ -9,7 +9,8 @@
 	// ─── IMPORTANT ──────────────────────────────────────────────────────────────────
 	//
 	// Download the MySQL connector for Java from https://dev.mysql.com/downloads/connector/j/
-	// And add the JAR into the classpath
+	// * Choose "Platform Independent"
+	// Unzip the archive and add the JAR into the classpath
 	// ─────────────────────────────────────────────────────────────────
 
 
