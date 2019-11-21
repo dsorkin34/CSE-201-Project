@@ -7,7 +7,7 @@ public enum SortingCriteria {
 	TITLE("title"), 
 	TITLE_REVERSE("title DESC"), 
 	AUTHOR("lname, fname"), 
-	AUTHOR_REVERSE("lname, fname DESC"),
+	AUTHOR_REVERSE("lname DESC, fname DESC"),
 	GENRE("genre"), 
 	GENRE_REVERSE("genre DESC"), 
 	RATING("avg(score)"), 
