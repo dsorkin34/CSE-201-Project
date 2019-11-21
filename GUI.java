@@ -18,30 +18,34 @@ import java.awt.event.ActionEvent;
  *
  */
 public class GUI extends JFrame {
-
-	private JPanel contentPane;
+	
+	//These are the multiple Databases that are used in the Program to store, and to add books, and users 
 	private static LocalBookShelf shelf;
-	private static LocalBookShelf queueShelf;
-	private static HashMap<String, String> community; 
+	private static ArrayList<Book> queueShelf;
+	private static HashMap<String, String> community;
+	//These statements are used to allow access to users who are logged in or Admins
 	private static boolean loggedIn = false;
 	private static boolean isAdmin = false;
-	private JPanel mainPane;
+	//The Description Panes are used here to be able to change on command
 	private static JScrollPane descriptionScrollPanel;
 	private static JScrollPane scrollPane;
 	private static JScrollPane approvePane;
-	private SpringLayout sl_Homepanel;
+	//These two variables are used to simulate a Single Page Application
 	private CardLayout cl_mainPane;
+	private JPanel mainPane;
+	private static JButton btnLoginRegister;
 	/**
 	 * Initiates the GUI
 	 */
 	public static void main(String[] args) {
 		shelf = new LocalBookShelf();
-		queueShelf = new LocalBookShelf();
+		queueShelf = new ArrayList<Book>();
 		community = new HashMap<String, String>();
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					GUI frame = new GUI();
+					frame.setResizable(false);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -59,34 +63,41 @@ public class GUI extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1023, 658);
 		
-		//Creates the Menu Bar that holds the LogIn/Register Button
+	//Creates the Menu Bar that holds the LogIn/Register Button
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
-		//Creates a JButton that creates the JFrame that is used for logging in/Registering
-		JButton btnLoginRegister = new JButton("LogIn/Register");
+	//Creates a JButton that creates the JFrame that is used for logging in/Registering
+		btnLoginRegister = new JButton("LogIn/Register");
 		btnLoginRegister.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				if(btnLoginRegister.getText().equals("LogIn/Register")) {
 				createLoginFrame(true);
+				}else {
+					btnLoginRegister.setText("LogIn/Register");
+					loggedIn = false;
+					isAdmin = false;
+				}
 			}
 		});
 		btnLoginRegister.setBackground(Color.BLACK);
 		btnLoginRegister.setForeground(Color.WHITE);
 		menuBar.add(btnLoginRegister);
-		contentPane = new JPanel();
+		JPanel contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		SpringLayout sl_contentPane = new SpringLayout();
 		contentPane.setLayout(sl_contentPane);
 		
-		//Creates a JButton that is used by users to return to the Default Home Panel of the page
+	//Creates a JButton that is used by users to return to the Default Home Panel of the page
 		JButton btnHome = new JButton("Home");
 		btnHome.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				createBookViewSection(shelf.searchBook(SearchingField.TITLE, "", SortingCriteria.TITLE));
+				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.TITLE);
+				createBookViewSection(shelf.getBookShelf());
 				cl_mainPane.first(mainPane);
 			}
 		});
@@ -96,10 +107,11 @@ public class GUI extends JFrame {
 		btnHome.setBackground(new Color(0, 0, 0));
 		contentPane.add(btnHome);
 		
-		//Creates a JButton that is used by the User to access the Contact Information of the Developers
+	//Creates a JButton that is used by the User to access the Contact Information of the Developers
 		JButton btnContactUs = new JButton("Contact Us");
 		btnContactUs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				//cl_mainPane.show(mainPane, "contactUsPanel");
 				cl_mainPane.show(mainPane, "contactUsPanel");
 			}
 		});
@@ -109,7 +121,7 @@ public class GUI extends JFrame {
 		btnContactUs.setBackground(new Color(0, 0, 0));
 		contentPane.add(btnContactUs);
 		
-		//Creates a JButton that is used by a Logged In User to access the Upload Panel
+	//Creates a JButton that is used by a Logged In User to access the Upload Panel
 		JButton btnRequestAnUpload = new JButton("Request an Upload");
 		btnRequestAnUpload.addMouseListener(new MouseAdapter() {
 			@Override
@@ -127,7 +139,7 @@ public class GUI extends JFrame {
 		btnRequestAnUpload.setBackground(new Color(0, 0, 0));
 		contentPane.add(btnRequestAnUpload);
 		
-		//Creates the TextField that will be used by the user, to look up specific books
+	//Creates the TextField that will be used by the user, to look up specific books
 		JTextField txtSearch = new JTextField();
 		sl_contentPane.putConstraint(SpringLayout.NORTH, txtSearch, 1, SpringLayout.NORTH, btnHome);
 		sl_contentPane.putConstraint(SpringLayout.WEST, txtSearch, 6, SpringLayout.EAST, btnRequestAnUpload);
@@ -143,7 +155,7 @@ public class GUI extends JFrame {
 		contentPane.add(txtSearch);
 		txtSearch.setColumns(10);
 		
-		//Creates the Button that takes the Input on the Search Text Field and returns an array of the books with these keywords
+	//Creates the Button that takes the Input on the Search Text Field and returns an array of the books with these keywords
 		JButton btnSearch = new JButton("Search");
 		sl_contentPane.putConstraint(SpringLayout.NORTH, btnSearch, 0, SpringLayout.NORTH, btnHome);
 		sl_contentPane.putConstraint(SpringLayout.WEST, btnSearch, 12, SpringLayout.EAST, txtSearch);
@@ -156,22 +168,23 @@ public class GUI extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				if(!(txtSearch.getText().equals("")||txtSearch.getText().equals("Search Books"))){
 				cl_mainPane.show(mainPane, "homePanel");
+				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.TITLE);
+				createBookViewSection(shelf.getBookShelf());
 				
-				createBookViewSection(shelf.searchBook(SearchingField.TITLE, txtSearch.getText(), SortingCriteria.TITLE));
 				}
 				txtSearch.setText("Search Books");
 			}
 		});
 		contentPane.add(btnSearch);
 		
-		//Creates the JButton that will be used by the Admin to access the Approval Panel
+	//Creates the JButton that will be used by the Admin to access the Approval Panel
 		JButton btnBookRequests = new JButton("Book Requests");
 		btnBookRequests.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if(isAdmin) {
 				cl_mainPane.show(mainPane, "approvalPanel");
-				createBookApproveSection(queueShelf.searchBook(SearchingField.TITLE, "", SortingCriteria.TITLE));
+				createBookApproveSection(queueShelf);
 				}
 			}
 		});
@@ -182,7 +195,7 @@ public class GUI extends JFrame {
 		contentPane.add(btnBookRequests);
 		btnBookRequests.setVisible(true);
 		
-		//Creates the Main Pane that will hold all functions of the other JPanels, Simulating a Single Page Application
+	//Creates the Main Pane that will hold all functions of the other JPanels, Simulating a Single Page Application
 		mainPane = new JPanel();
 		sl_contentPane.putConstraint(SpringLayout.SOUTH, mainPane, -5, SpringLayout.SOUTH, contentPane);
 		mainPane.setBackground(Color.WHITE);
@@ -193,14 +206,14 @@ public class GUI extends JFrame {
 		cl_mainPane = new CardLayout(0,0);
 		mainPane.setLayout(cl_mainPane);
 		
-		//Creates the starting Pane that will be used to display books in a list that can be sorted
+	//Creates the starting Pane that will be used to display books in a list that can be sorted
 		JPanel homePanel = new JPanel();
 		homePanel.setBackground(Color.WHITE);
 		mainPane.add(homePanel, "homePanel");
-		sl_Homepanel = new SpringLayout();
+		SpringLayout sl_Homepanel = new SpringLayout();
 		homePanel.setLayout(sl_Homepanel);
 		
-		//Creates the Panel that will be in the homePanel that will be holding each of the books for the use to view
+	//Creates the Panel that will be in the homePanel that will be holding each of the books for the use to view
 		descriptionScrollPanel = new JScrollPane();
 		descriptionScrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		descriptionScrollPanel.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
@@ -208,7 +221,7 @@ public class GUI extends JFrame {
 		descriptionScrollPanel.getViewport().setBackground(Color.WHITE);
 		mainPane.add(descriptionScrollPanel, "descriptionScrollPanel");
 		
-		//Creates the Pane that will be in the homePanel. This will hold the sorting radio buttons, and filter checkboxes
+	//Creates the Pane that will be in the homePanel. This will hold the sorting radio buttons, and filter checkboxes
 		JPanel sortFilterPanel = addFilterSortSection();
 		sl_Homepanel.putConstraint(SpringLayout.NORTH, sortFilterPanel, 10, SpringLayout.NORTH, homePanel);
 		sl_Homepanel.putConstraint(SpringLayout.WEST, sortFilterPanel, 8, SpringLayout.WEST, homePanel);
@@ -218,8 +231,9 @@ public class GUI extends JFrame {
 		sortFilterPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		homePanel.add(sortFilterPanel);
 		
-		//Creates the ScrollPane that will display a panel showing the description of a Book with a rating and comments
+	//Creates the ScrollPane that will display a panel showing the description of a Book with a rating and comments
 		scrollPane = new JScrollPane();
+		sl_Homepanel.putConstraint(SpringLayout.SOUTH, sortFilterPanel, 146, SpringLayout.NORTH, homePanel);
 		sl_Homepanel.putConstraint(SpringLayout.NORTH, scrollPane, 10, SpringLayout.NORTH, homePanel);
 		sl_Homepanel.putConstraint(SpringLayout.WEST, scrollPane, -752, SpringLayout.EAST, homePanel);
 		sl_Homepanel.putConstraint(SpringLayout.SOUTH, scrollPane, -45, SpringLayout.SOUTH, homePanel);
@@ -230,37 +244,44 @@ public class GUI extends JFrame {
 		sl_contentPane.putConstraint(SpringLayout.EAST, scrollPane, -26, SpringLayout.EAST, contentPane);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		createBookViewSection(shelf.searchBook(SearchingField.TITLE, "", SortingCriteria.TITLE));
+		shelf.sortBy(shelf.getBookShelf(),SortingCriteria.TITLE);
+		createBookViewSection(shelf.getBookShelf());
 		homePanel.add(scrollPane, "name_1458073958000");
 		
-		//Creates the panel for users to request uploads
+	//Creates the panel for users to request uploads
 		JPanel uploadPanel = createRequestPanel();
 		mainPane.add(uploadPanel, "upload");
+		
+	//Creates the panel that displays a books Description
 		JPanel descriptionPanel = new JPanel();
 		descriptionPanel.setBackground(Color.WHITE);
 		SpringLayout sl_descriptionPanel = new SpringLayout();
 		descriptionPanel.setLayout(sl_descriptionPanel);
 		
-		//Creates the panel used for Admins to approve or deny books
+	//Creates the panel used for Admins to approve or deny books
 		JPanel approvalPanel = new JPanel();
 		approvalPanel.setBackground(Color.WHITE);
 		mainPane.add(approvalPanel, "approvalPanel");
 		SpringLayout sl_approvalPanel = new SpringLayout();
 		approvalPanel.setLayout(sl_approvalPanel);
 		
-		//Creates the ScrollPane that will be used to display the pending books
+	//Creates the ScrollPane that will be used to display the pending books
 		approvePane = new JScrollPane();
 		sl_approvalPanel.putConstraint(SpringLayout.EAST, approvePane, 936, SpringLayout.WEST, approvalPanel);
 		approvePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		sl_approvalPanel.putConstraint(SpringLayout.NORTH, approvePane, 10, SpringLayout.NORTH, approvalPanel);
 		sl_approvalPanel.putConstraint(SpringLayout.WEST, approvePane, 10, SpringLayout.WEST, approvalPanel);
 		sl_approvalPanel.putConstraint(SpringLayout.SOUTH, approvePane, 515, SpringLayout.NORTH, approvalPanel);
-		createBookApproveSection(queueShelf.searchBook(SearchingField.TITLE, "", SortingCriteria.TITLE));
+		createBookApproveSection(queueShelf);
 		approvalPanel.add(approvePane);
 		
-		//Creates the Panel showinf each of the developers contact info
+	//Creates the Panel show info each of the developers contact info
 		JPanel contactUsPanel = createContactUsPanel();
 		mainPane.add(contactUsPanel, "contactUsPanel");
+		
+		
+		
+		
 	}//End Constructor
 	
 	/**
@@ -285,7 +306,8 @@ public class GUI extends JFrame {
 		author.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				createBookViewSection(shelf.searchBook(SearchingField.AUTHOR, "", SortingCriteria.AUTHOR));
+				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.AUTHOR);
+				createBookViewSection(shelf.getBookShelf());
 			}
 		});
 		author.setBackground(Color.WHITE);
@@ -297,7 +319,8 @@ public class GUI extends JFrame {
 		title.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				createBookViewSection(shelf.searchBook(SearchingField.TITLE, "", SortingCriteria.TITLE));
+				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.TITLE);
+				createBookViewSection(shelf.getBookShelf());
 			}
 		});
 		title.setBackground(Color.WHITE);
@@ -309,7 +332,8 @@ public class GUI extends JFrame {
 		genre.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				createBookViewSection(shelf.searchBook(SearchingField.GENRE, "", SortingCriteria.GENRE));
+				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.GENRE);
+				createBookViewSection(shelf.getBookShelf());
 			}
 		});
 		genre.setBackground(Color.WHITE);
@@ -321,48 +345,6 @@ public class GUI extends JFrame {
 		sort.add(title);
 		sort.add(genre);
 		
-		JLabel lblFilter = new JLabel("Filter");
-		sl_sortFilterPanel.putConstraint(SpringLayout.NORTH, lblFilter, 8, SpringLayout.SOUTH, genre);
-		sl_sortFilterPanel.putConstraint(SpringLayout.WEST, lblFilter, 12, SpringLayout.WEST, sortFilterPanel);
-		sl_sortFilterPanel.putConstraint(SpringLayout.EAST, lblFilter, 0, SpringLayout.EAST, lblSortBy);
-		lblFilter.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
-		sortFilterPanel.add(lblFilter);
-		
-		JLabel lblRating = new JLabel("Rating");
-		sl_sortFilterPanel.putConstraint(SpringLayout.NORTH, lblRating, 9, SpringLayout.SOUTH, lblFilter);
-		sl_sortFilterPanel.putConstraint(SpringLayout.WEST, lblRating, 0, SpringLayout.WEST, lblSortBy);
-		lblRating.setFont(new Font("Tahoma", Font.BOLD, 14));
-		sortFilterPanel.add(lblRating);
-		
-		JCheckBox chckbxOneStar = new JCheckBox("One Star *");
-		chckbxOneStar.setBackground(Color.WHITE);
-		sl_sortFilterPanel.putConstraint(SpringLayout.NORTH, chckbxOneStar, 6, SpringLayout.SOUTH, lblRating);
-		sl_sortFilterPanel.putConstraint(SpringLayout.WEST, chckbxOneStar, 0, SpringLayout.WEST, lblSortBy);
-		sortFilterPanel.add(chckbxOneStar);
-		
-		JCheckBox chckbxTwoStar = new JCheckBox("Two Star **");
-		chckbxTwoStar.setBackground(Color.WHITE);
-		sl_sortFilterPanel.putConstraint(SpringLayout.NORTH, chckbxTwoStar, 6, SpringLayout.SOUTH, chckbxOneStar);
-		sl_sortFilterPanel.putConstraint(SpringLayout.WEST, chckbxTwoStar, 0, SpringLayout.WEST, lblSortBy);
-		sortFilterPanel.add(chckbxTwoStar);
-		
-		JCheckBox chckbxThreeStar = new JCheckBox("Three Star ***");
-		chckbxThreeStar.setBackground(Color.WHITE);
-		sl_sortFilterPanel.putConstraint(SpringLayout.NORTH, chckbxThreeStar, 6, SpringLayout.SOUTH, chckbxTwoStar);
-		sl_sortFilterPanel.putConstraint(SpringLayout.WEST, chckbxThreeStar, 0, SpringLayout.WEST, lblSortBy);
-		sortFilterPanel.add(chckbxThreeStar);
-		
-		JCheckBox chckbxFourStar = new JCheckBox("Four Star ****");
-		chckbxFourStar.setBackground(Color.WHITE);
-		sl_sortFilterPanel.putConstraint(SpringLayout.NORTH, chckbxFourStar, 6, SpringLayout.SOUTH, chckbxThreeStar);
-		sl_sortFilterPanel.putConstraint(SpringLayout.WEST, chckbxFourStar, 0, SpringLayout.WEST, lblSortBy);
-		sortFilterPanel.add(chckbxFourStar);
-		
-		JCheckBox chckbxFiveStar = new JCheckBox("Five Star *****");
-		chckbxFiveStar.setBackground(Color.WHITE);
-		sl_sortFilterPanel.putConstraint(SpringLayout.NORTH, chckbxFiveStar, 6, SpringLayout.SOUTH, chckbxFourStar);
-		sl_sortFilterPanel.putConstraint(SpringLayout.WEST, chckbxFiveStar, 0, SpringLayout.WEST, lblSortBy);
-		sortFilterPanel.add(chckbxFiveStar);
 		return sortFilterPanel;
 		
 	}//End FilterPanel
@@ -370,14 +352,15 @@ public class GUI extends JFrame {
 	/**
 	 * Creates a Panel that shows the list of Books in the ArrayList, and puts them into the 
 	 * ScrollPane that is inside of the GUI constructor
+	 * @param books is the ArrayList of books that will be taken in to create panels for each book
 	 */
 	private void createBookViewSection(ArrayList<Book> books) {
 		JPanel menu = new JPanel();
 		menu.setBackground(Color.WHITE);
 		menu.setLayout(new GridLayout(10,2));
 		for(int i=0;i<books.size();i++) {
-		JPanel description = createBookPanel(books.get(i));
 		Book tempBook = books.get(i);
+		JPanel description = createBookPanel(tempBook);
 		description.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -405,24 +388,16 @@ public class GUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				shelf.addBook(tempBook);
-				try {
-					queueShelf.removeBook(tempBook.getISBN());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				createBookApproveSection(queueShelf.searchBook(SearchingField.TITLE, "", SortingCriteria.TITLE));
+				queueShelf.remove(queueShelf.indexOf(tempBook));
+				createBookApproveSection(queueShelf);
 			}
 		});
 		JButton deny = new JButton("Deny");
 		deny.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				try {
-					queueShelf.removeBook(tempBook.getISBN());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				createBookApproveSection(queueShelf.searchBook(SearchingField.TITLE, "", SortingCriteria.TITLE));
+				queueShelf.remove(queueShelf.indexOf(tempBook));
+				createBookApproveSection(queueShelf);
 			}
 		});
 		description.add(approve);
@@ -431,6 +406,7 @@ public class GUI extends JFrame {
 		menu.add(description);
 		}
 		approvePane.setViewportView(menu);
+		
 	}//End createBookViewSection
 	/**
 	 * Creates a formatted book to be displayed within the HomePanel in the ScrollPane
@@ -442,6 +418,7 @@ public class GUI extends JFrame {
 		JLabel bookAuthor = new JLabel("Author: "+newBook.getfName()+" "+newBook.getlName());
 		JLabel bookDescription = new JLabel("Genre:  "+newBook.getGenre());
 		JLabel bookRating = new JLabel("Rating: "+newBook.getRating()+"Stars");
+		System.out.println(newBook.getRating());
 		bookPanel.add(bookLabel);
 		bookPanel.add(bookAuthor);
 		bookPanel.add(bookDescription);
@@ -452,24 +429,39 @@ public class GUI extends JFrame {
 	}//End createBookPanel
 	
 	/**
-	 * Creates a Panel displays the Title, Author, Rating, and Comments from a Book depending on the
+	 * Creates a Panel that displays the Title, Author, Rating, and Comments from a Book depending on the
 	 * parameter
-	 * @param book is a Book object that will be used to create the Description Panel
+	 * @param book is the Book object that will be used to create the description Panel
 	 */
 	private static void createDescriptionPanel(Book book) {
-		JPanel descriptionPanel = new JPanel();
-		descriptionPanel.setBackground(Color.WHITE);
-		SpringLayout sl_descriptionPanel = new SpringLayout();
-		descriptionPanel.setLayout(sl_descriptionPanel);
+		JPanel descriptionPanelTest = new JPanel();
+		descriptionPanelTest.setBackground(Color.WHITE);
+		GridBagLayout gbl_descriptionPanelTest = new GridBagLayout();
+		gbl_descriptionPanelTest.columnWidths = new int[]{901, 0};
+		gbl_descriptionPanelTest.rowHeights = new int[]{312, 591, 0};
+		gbl_descriptionPanelTest.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_descriptionPanelTest.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		descriptionPanelTest.setLayout(gbl_descriptionPanelTest);
+		
+		JPanel commentsPanel = new JPanel();
+		commentsPanel.setBackground(Color.WHITE);
+		commentsPanel.setLayout(new GridLayout(10, 0, 0, 0));
+		GridBagConstraints gbc_commentsPanel = new GridBagConstraints();
+		gbc_commentsPanel.fill = GridBagConstraints.BOTH;
+		gbc_commentsPanel.gridx = 0;
+		gbc_commentsPanel.gridy = 1;
+		descriptionPanelTest.add(commentsPanel, gbc_commentsPanel);
 		
 		JPanel bookInfoPanel = new JPanel();
-		sl_descriptionPanel.putConstraint(SpringLayout.NORTH, bookInfoPanel, 10, SpringLayout.NORTH, descriptionPanel);
-		sl_descriptionPanel.putConstraint(SpringLayout.WEST, bookInfoPanel, 10, SpringLayout.WEST, descriptionPanel);
-		sl_descriptionPanel.putConstraint(SpringLayout.EAST, bookInfoPanel, -10, SpringLayout.EAST, descriptionPanel);
 		bookInfoPanel.setBackground(Color.WHITE);
 		SpringLayout sl_panel_1 = new SpringLayout();
 		bookInfoPanel.setLayout(sl_panel_1);
-		descriptionPanel.add(bookInfoPanel);
+		GridBagConstraints gbc_bookInfoPanel = new GridBagConstraints();
+		gbc_bookInfoPanel.fill = GridBagConstraints.BOTH;
+		gbc_bookInfoPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_bookInfoPanel.gridx = 0;
+		gbc_bookInfoPanel.gridy = 0;
+		descriptionPanelTest.add(bookInfoPanel, gbc_bookInfoPanel);
 		
 		JLabel lblTitle = new JLabel(book.getTitle());
 		lblTitle.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -483,29 +475,17 @@ public class GUI extends JFrame {
 		sl_panel_1.putConstraint(SpringLayout.WEST, lblAuthor, 0, SpringLayout.WEST, lblTitle);
 		bookInfoPanel.add(lblAuthor);
 		
-		JLabel lblRating_1 = new JLabel("Rating: "+book.getRating()+" Stars");
-		sl_panel_1.putConstraint(SpringLayout.NORTH, lblRating_1, 6, SpringLayout.SOUTH, lblAuthor);
-		sl_panel_1.putConstraint(SpringLayout.WEST, lblRating_1, 0, SpringLayout.WEST, lblTitle);
-		bookInfoPanel.add(lblRating_1);
+		JLabel lblRating = new JLabel("Rating: "+book.getRating()+" Stars");
+		sl_panel_1.putConstraint(SpringLayout.NORTH, lblRating, 6, SpringLayout.SOUTH, lblAuthor);
+		sl_panel_1.putConstraint(SpringLayout.WEST, lblRating, 0, SpringLayout.WEST, lblTitle);
+		bookInfoPanel.add(lblRating);
 		
 		JLabel lblDescription = new JLabel("Description: "+book.getDescription());
 		sl_panel_1.putConstraint(SpringLayout.NORTH, lblDescription, 30, SpringLayout.SOUTH, lblAuthor);
 		sl_panel_1.putConstraint(SpringLayout.WEST, lblDescription, 10, SpringLayout.WEST, bookInfoPanel);
 		bookInfoPanel.add(lblDescription);
-		descriptionScrollPanel.setViewportView(descriptionPanel);
 		
-		JPanel commentsPanel = new JPanel();
-		sl_descriptionPanel.putConstraint(SpringLayout.SOUTH, commentsPanel, 400, SpringLayout.SOUTH, descriptionPanel);
-		sl_descriptionPanel.putConstraint(SpringLayout.SOUTH, bookInfoPanel, -8, SpringLayout.NORTH, commentsPanel);
-		sl_descriptionPanel.putConstraint(SpringLayout.WEST, commentsPanel, 10, SpringLayout.WEST, descriptionPanel);
-		sl_descriptionPanel.putConstraint(SpringLayout.EAST, commentsPanel, -10, SpringLayout.EAST, descriptionPanel);
-		sl_descriptionPanel.putConstraint(SpringLayout.NORTH, commentsPanel, 330, SpringLayout.NORTH, descriptionPanel);
-		commentsPanel.setBackground(Color.WHITE);
-		GridBagConstraints gbc_commentPanel = new GridBagConstraints();
-		gbc_commentPanel.fill = GridBagConstraints.BOTH;
-		gbc_commentPanel.gridx = 0;
-		gbc_commentPanel.gridy = 0;
-		
+		//Creates the Comments TextPane
 		JTextPane textPane = new JTextPane();
 		textPane.addMouseListener(new MouseAdapter() {
 			@Override
@@ -524,26 +504,30 @@ public class GUI extends JFrame {
 		textPane.setBackground(Color.WHITE);
 		bookInfoPanel.add(textPane);
 		
-		JButton button = new JButton("Submit Comment");
-		button.addMouseListener(new MouseAdapter() {
+		
+		//Creates the Submit Comment button
+		JButton submitCommentButton = new JButton("Submit Comment");
+		submitCommentButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if(loggedIn) {
-				if(!(textPane.getText().equals("Add a Comment")||textPane.getText().equals(""))) {
-				book.addComment(textPane.getText());
-				commentsPanel.add(createCommentPanel(textPane.getText()));
-				textPane.setText("Add a Comment");
-				}
+					if(!(textPane.getText().equals("Add a Comment")||textPane.getText().equals(""))) {
+						book.addComment(textPane.getText());
+						commentsPanel.add(createCommentPanel(textPane.getText()));
+						textPane.setText("Add a Comment");
+					}
 				}else {
 					createLoginFrame(true);
 				}
 			}
 		});
-		button.setBackground(Color.BLACK);
-		button.setForeground(Color.WHITE);
-		sl_panel_1.putConstraint(SpringLayout.NORTH, button, 0, SpringLayout.NORTH, textPane);
-		sl_panel_1.putConstraint(SpringLayout.WEST, button, 5, SpringLayout.EAST, textPane);
+		submitCommentButton.setBackground(Color.BLACK);
+		submitCommentButton.setForeground(Color.WHITE);
+		sl_panel_1.putConstraint(SpringLayout.NORTH, submitCommentButton, 0, SpringLayout.NORTH, textPane);
+		sl_panel_1.putConstraint(SpringLayout.WEST, submitCommentButton, 5, SpringLayout.EAST, textPane);
+		bookInfoPanel.add(submitCommentButton);
 		
+		//Creates the Combo Box used to Select the Rating
 		JComboBox<String> ratingcomboBox = new JComboBox<String>();
 		sl_panel_1.putConstraint(SpringLayout.NORTH, ratingcomboBox, 129, SpringLayout.SOUTH, lblDescription);
 		sl_panel_1.putConstraint(SpringLayout.WEST, ratingcomboBox, 0, SpringLayout.WEST, lblTitle);
@@ -556,13 +540,13 @@ public class GUI extends JFrame {
 		ratingcomboBox.addItem("5 Star");
 		bookInfoPanel.add(ratingcomboBox);
 		
+		//Creates the Button that lets the User Submit their Rating
 		JButton btnSubmitRating = new JButton("Submit Rating");
 		btnSubmitRating.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if(loggedIn) {
 					if(ratingcomboBox.getSelectedIndex()!=0) {
-					System.out.println(ratingcomboBox.getSelectedIndex());
 					book.addRating(ratingcomboBox.getSelectedIndex());
 					createDescriptionPanel(book);
 					}
@@ -572,16 +556,31 @@ public class GUI extends JFrame {
 			}
 		});
 		sl_panel_1.putConstraint(SpringLayout.WEST, textPane, 6, SpringLayout.EAST, btnSubmitRating);
-		sl_panel_1.putConstraint(SpringLayout.NORTH, btnSubmitRating, 0, SpringLayout.NORTH, button);
+		sl_panel_1.putConstraint(SpringLayout.NORTH, btnSubmitRating, 0, SpringLayout.NORTH, submitCommentButton);
 		sl_panel_1.putConstraint(SpringLayout.WEST, btnSubmitRating, 6, SpringLayout.EAST, ratingcomboBox);
 		btnSubmitRating.setForeground(Color.WHITE);
 		btnSubmitRating.setBackground(Color.BLACK);
 		bookInfoPanel.add(btnSubmitRating);
-		bookInfoPanel.add(button);
-		descriptionPanel.add(commentsPanel);
-		commentsPanel.setLayout(new GridLayout(10, 0, 0, 0));
+		
+		//Adds the saved comments previously added to the book
+		ArrayList<JPanel> savedComments = createStartCommentPanel(book.getComments());
+		for(JPanel comment: savedComments) {
+			commentsPanel.add(comment);
+		}
+		descriptionScrollPanel.setViewportView(descriptionPanelTest);
 	}//End createDescriptionPanel
-	
+	/**
+	 * 
+	 * @param comments is the comments that are currently saved for a given Book
+	 * @return commentsPanels is the comments Strings converted into JPanels to be displayed in Book Descriptions
+	 */
+	private static ArrayList<JPanel> createStartCommentPanel(ArrayList<String> comments) {
+		ArrayList<JPanel> commentsPanels = new ArrayList<JPanel>();
+		for(int i=0;i<comments.size();i++) {
+			commentsPanels.add(createCommentPanel(comments.get(i)));
+		}
+		return commentsPanels;
+	}
 	/**
 	 * 
 	 * @param Comment is the Comment that will be Used to create the Panel displaying the Comment
@@ -617,22 +616,27 @@ public class GUI extends JFrame {
 		logInFrame.setBounds(100, 100, 300, 150);
 		JPanel logInInfo = new JPanel();
 		JTextField userName = new JTextField();
-		JTextField password = new JTextField();
+		JPasswordField password = new JPasswordField();
+		password.setEchoChar('*');
 		JLabel passwordLabel = new JLabel("Password");
 		passwordLabel.setBackground(Color.WHITE);
 		JLabel userNameLabel = new JLabel("UserName");
 		userNameLabel.setBackground(Color.WHITE);
-		JButton submit = new JButton("LogIn");
-		submit.addMouseListener(new MouseAdapter() {
+		
+		//Creates the LogIn button and its' MouseClicked Event
+		JButton logInButton = new JButton("LogIn");
+		logInButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 					
 					if(userName.getText().equals("Admin")&&password.getText().equals("AdminPassword")) {
 						loggedIn = true;
 						isAdmin = true;
+						btnLoginRegister.setText("LogOff Admin");
 						logInFrame.dispose();
 					}else if(community.containsKey(userName.getText())&&community.containsValue(password.getText())) {
 						loggedIn = true;
+						btnLoginRegister.setText("LogOff "+userName.getText());
 						logInFrame.dispose();
 					}else {
 						logInFrame.dispose();
@@ -641,8 +645,9 @@ public class GUI extends JFrame {
 				}
 		});
 		
-		JButton register = new JButton("Register");
-		register.addMouseListener(new MouseAdapter() {
+		//Creates the Register Button, and adds its' MouseClicked Event
+		JButton registerButton = new JButton("Register");
+		registerButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 					if(community.containsKey(userName.getText())){
@@ -653,6 +658,7 @@ public class GUI extends JFrame {
 						User newUser = new User(userName.getText(),password.getText());
 						community.put(newUser.getName(), newUser.getPassword());
 						loggedIn = true;
+						btnLoginRegister.setText("LogOff "+userName.getText());
 						logInFrame.dispose();
 						
 					}else {
@@ -668,8 +674,8 @@ public class GUI extends JFrame {
 		logInInfo.add(userName);
 		logInInfo.add(passwordLabel);
 		logInInfo.add(password);
-		logInInfo.add(submit);
-		logInInfo.add(register);
+		logInInfo.add(logInButton);
+		logInInfo.add(registerButton);
 		}else {
 			logInInfo.setLayout(new GridLayout(3,3));
 			logInInfo.add(userNameLabel);
@@ -678,8 +684,8 @@ public class GUI extends JFrame {
 			logInInfo.add(passwordLabel);
 			logInInfo.add(password);
 			logInInfo.add(new JLabel("Invalid Input"));
-			logInInfo.add(submit);
-			logInInfo.add(register);
+			logInInfo.add(logInButton);
+			logInInfo.add(registerButton);
 		}
 		logInFrame.getContentPane().add(logInInfo);
 		logInFrame.setVisible(true);
@@ -695,18 +701,22 @@ public class GUI extends JFrame {
 		uploadPanel.setBackground(Color.WHITE);
 		SpringLayout sl_panel = new SpringLayout();
 		uploadPanel.setLayout(sl_panel);
+		
+		//Creates the TextField that the User Inputs the Title 
 		JTextField textFieldTitle = new JTextField();
 		sl_panel.putConstraint(SpringLayout.WEST, textFieldTitle, 10, SpringLayout.WEST, uploadPanel);
 		sl_panel.putConstraint(SpringLayout.EAST, textFieldTitle, -766, SpringLayout.EAST, uploadPanel);
 		uploadPanel.add(textFieldTitle);
 		textFieldTitle.setColumns(10);
 		
+		//Creates the TextField that the User Inputs the Author
 		JTextField textFieldAuthor = new JTextField();
 		sl_panel.putConstraint(SpringLayout.WEST, textFieldAuthor, 0, SpringLayout.WEST, textFieldTitle);
 		sl_panel.putConstraint(SpringLayout.EAST, textFieldAuthor, -766, SpringLayout.EAST, uploadPanel);
 		uploadPanel.add(textFieldAuthor);
 		textFieldAuthor.setColumns(10);
 		
+		//Creates the ComboBox that the User Inputs the Genre
 		JComboBox comboBoxGenre = new JComboBox();
 		sl_panel.putConstraint(SpringLayout.WEST, comboBoxGenre, 0, SpringLayout.WEST, textFieldTitle);
 		sl_panel.putConstraint(SpringLayout.EAST, comboBoxGenre, 0, SpringLayout.EAST, textFieldTitle);
@@ -715,12 +725,17 @@ public class GUI extends JFrame {
 		comboBoxGenre.addItem("Horror");
 		comboBoxGenre.addItem("Children's");
 		comboBoxGenre.addItem("Romance");
+		comboBoxGenre.addItem("Fiction");
+		comboBoxGenre.addItem("Non-Fiction");
 		uploadPanel.add(comboBoxGenre);
 		
+		//Creates the TextArea that the User Inputs the Description
 		JTextArea textAreaDescription = new JTextArea();
-		sl_panel.putConstraint(SpringLayout.WEST, textAreaDescription, 0, SpringLayout.WEST, textFieldTitle);
+		sl_panel.putConstraint(SpringLayout.NORTH, textAreaDescription, 270, SpringLayout.NORTH, uploadPanel);
+		sl_panel.putConstraint(SpringLayout.WEST, textAreaDescription, 10, SpringLayout.WEST, uploadPanel);
 		sl_panel.putConstraint(SpringLayout.EAST, textAreaDescription, -582, SpringLayout.EAST, uploadPanel);
-		textAreaDescription.setColumns(10);
+		textAreaDescription.setLineWrap(true);
+		textAreaDescription.setWrapStyleWord(true);
 		textAreaDescription.setBorder(new LineBorder(new Color(0, 0, 0)));
 		uploadPanel.add(textAreaDescription);
 		
@@ -731,59 +746,84 @@ public class GUI extends JFrame {
 		sl_panel.putConstraint(SpringLayout.NORTH, lblUpload, 10, SpringLayout.NORTH, uploadPanel);
 		uploadPanel.add(lblUpload);
 		
-		JLabel lblTitle_1 = new JLabel("Title");
-		lblTitle_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		sl_panel.putConstraint(SpringLayout.WEST, lblTitle_1, 10, SpringLayout.WEST, uploadPanel);
-		sl_panel.putConstraint(SpringLayout.NORTH, textFieldTitle, 6, SpringLayout.SOUTH, lblTitle_1);
-		lblTitle_1.setBackground(Color.WHITE);
-		sl_panel.putConstraint(SpringLayout.NORTH, lblTitle_1, 6, SpringLayout.SOUTH, lblUpload);
-		uploadPanel.add(lblTitle_1);
+		JLabel lblTitle = new JLabel("Title");
+		lblTitle.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		sl_panel.putConstraint(SpringLayout.WEST, lblTitle, 10, SpringLayout.WEST, uploadPanel);
+		sl_panel.putConstraint(SpringLayout.NORTH, textFieldTitle, 6, SpringLayout.SOUTH, lblTitle);
+		lblTitle.setBackground(Color.WHITE);
+		sl_panel.putConstraint(SpringLayout.NORTH, lblTitle, 6, SpringLayout.SOUTH, lblUpload);
+		uploadPanel.add(lblTitle);
 		
-		JLabel lblAuthor_1 = new JLabel("Author");
-		sl_panel.putConstraint(SpringLayout.NORTH, textFieldAuthor, 6, SpringLayout.SOUTH, lblAuthor_1);
-		lblAuthor_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblAuthor_1.setBackground(Color.WHITE);
-		sl_panel.putConstraint(SpringLayout.NORTH, lblAuthor_1, 6, SpringLayout.SOUTH, textFieldTitle);
-		sl_panel.putConstraint(SpringLayout.WEST, lblAuthor_1, 10, SpringLayout.WEST, uploadPanel);
-		uploadPanel.add(lblAuthor_1);
+		JLabel lblAuthor = new JLabel("Author");
+		sl_panel.putConstraint(SpringLayout.NORTH, textFieldAuthor, 6, SpringLayout.SOUTH, lblAuthor);
+		lblAuthor.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblAuthor.setBackground(Color.WHITE);
+		sl_panel.putConstraint(SpringLayout.NORTH, lblAuthor, 6, SpringLayout.SOUTH, textFieldTitle);
+		sl_panel.putConstraint(SpringLayout.WEST, lblAuthor, 10, SpringLayout.WEST, uploadPanel);
+		uploadPanel.add(lblAuthor);
 		
 		JLabel lblGenre = new JLabel("Genre");
-		sl_panel.putConstraint(SpringLayout.NORTH, comboBoxGenre, 4, SpringLayout.SOUTH, lblGenre);
+		sl_panel.putConstraint(SpringLayout.WEST, lblGenre, 0, SpringLayout.WEST, textFieldTitle);
+		sl_panel.putConstraint(SpringLayout.SOUTH, lblGenre, -6, SpringLayout.NORTH, comboBoxGenre);
 		lblGenre.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblGenre.setBackground(Color.WHITE);
-		sl_panel.putConstraint(SpringLayout.NORTH, lblGenre, 6, SpringLayout.SOUTH, textFieldAuthor);
-		sl_panel.putConstraint(SpringLayout.WEST, lblGenre, 0, SpringLayout.WEST, textFieldTitle);
 		uploadPanel.add(lblGenre);
 		
-		JLabel lblDescriptionInput = new JLabel("Description");
-		sl_panel.putConstraint(SpringLayout.NORTH, textAreaDescription, 9, SpringLayout.SOUTH, lblDescriptionInput);
-		sl_panel.putConstraint(SpringLayout.NORTH, lblDescriptionInput, 34, SpringLayout.SOUTH, lblGenre);
-		sl_panel.putConstraint(SpringLayout.WEST, lblDescriptionInput, 0, SpringLayout.WEST, textFieldTitle);
-		uploadPanel.add(lblDescriptionInput);
 		
+		JTextField textFieldISBN = new JTextField();
+		sl_panel.putConstraint(SpringLayout.WEST, textFieldISBN, 10, SpringLayout.WEST, uploadPanel);
+		sl_panel.putConstraint(SpringLayout.SOUTH, textFieldISBN, -1, SpringLayout.NORTH, lblGenre);
+		sl_panel.putConstraint(SpringLayout.EAST, textFieldISBN, 0, SpringLayout.EAST, textFieldTitle);
+		uploadPanel.add(textFieldISBN);
+		textFieldISBN.setColumns(10);
+		
+		JLabel lblDescription = new JLabel("Description");
+		sl_panel.putConstraint(SpringLayout.SOUTH, comboBoxGenre, -6, SpringLayout.NORTH, lblDescription);
+		sl_panel.putConstraint(SpringLayout.WEST, lblDescription, 0, SpringLayout.WEST, textFieldTitle);
+		sl_panel.putConstraint(SpringLayout.SOUTH, lblDescription, -6, SpringLayout.NORTH, textAreaDescription);
+		uploadPanel.add(lblDescription);
+		
+		JLabel lblIsbn = new JLabel("ISBN");
+		lblIsbn.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblIsbn.setBackground(Color.WHITE);
+		sl_panel.putConstraint(SpringLayout.NORTH, lblIsbn, 6, SpringLayout.SOUTH, textFieldAuthor);
+		sl_panel.putConstraint(SpringLayout.WEST, lblIsbn, 0, SpringLayout.WEST, textFieldTitle);
+		uploadPanel.add(lblIsbn);
+		
+		//Creates the Button where the User submits the book they have put into the previous fields
 		JButton btnSubmitRequest = new JButton("Submit Request");
+		sl_panel.putConstraint(SpringLayout.SOUTH, textAreaDescription, -6, SpringLayout.NORTH, btnSubmitRequest);
+		sl_panel.putConstraint(SpringLayout.NORTH, btnSubmitRequest, 409, SpringLayout.NORTH, uploadPanel);
+		sl_panel.putConstraint(SpringLayout.WEST, btnSubmitRequest, 0, SpringLayout.WEST, textFieldTitle);
 		btnSubmitRequest.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if(!(comboBoxGenre.getSelectedItem().equals("Genre's")||textFieldTitle.getText().equals("")||textFieldAuthor.getText().equals("")||textAreaDescription.getText().equals(""))) {
-					Book upload = new Book("12345",textFieldTitle.getText(),textFieldAuthor.getText(),textAreaDescription.getText(),(String) comboBoxGenre.getSelectedItem());
-					queueShelf.addBook(upload);
+				if(!(comboBoxGenre.getSelectedItem().equals("Genre's")||textFieldTitle.getText().equals("")||textFieldAuthor.getText().equals("")||textAreaDescription.getText().equals("")||textFieldISBN.getText().equals(""))) {
+					Book upload = new Book(textFieldISBN.getText(),textFieldTitle.getText(),textFieldAuthor.getText(),textAreaDescription.getText(),(String) comboBoxGenre.getSelectedItem());
+					queueShelf.add(upload);
 					comboBoxGenre.setSelectedIndex(0);
 					textFieldTitle.setText("");
 					textFieldAuthor.setText("");
+					textFieldISBN.setText("");
 					textAreaDescription.setText("");
 				}else {
-					comboBoxGenre.setSelectedIndex(0);
-					textFieldTitle.setText("Invalid Entry Enter Again");
-					textFieldAuthor.setText("Invalid Entry Enter Again");
-					textAreaDescription.setText("Invalid Entry Enter Again");
+					if(comboBoxGenre.getSelectedItem().equals("Genre's")) {
+					String error = "Invalid Entry";
+					comboBoxGenre.addItem(error);
+					comboBoxGenre.setSelectedItem(error);
+					}
+					if(textFieldTitle.getText().equals(""))
+					textFieldTitle.setText("Invalid Entry. Enter Again");
+					if(textFieldAuthor.getText().equals(""))
+					textFieldAuthor.setText("Invalid Entry. Enter Again");
+					if(textFieldISBN.getText().equals(""))
+					textFieldISBN.setText("Invalid Entry. Enter Again");
+					if(textAreaDescription.getText().equals(""))
+					textAreaDescription.setText("Invalid Entry. Enter Again");
 				}
 	}});
-		sl_panel.putConstraint(SpringLayout.SOUTH, textAreaDescription, -6, SpringLayout.NORTH, btnSubmitRequest);
-		sl_panel.putConstraint(SpringLayout.NORTH, btnSubmitRequest, 364, SpringLayout.NORTH, uploadPanel);
 		btnSubmitRequest.setForeground(Color.WHITE);
 		btnSubmitRequest.setBackground(Color.BLACK);
-		sl_panel.putConstraint(SpringLayout.WEST, btnSubmitRequest, 10, SpringLayout.WEST, uploadPanel);
 		uploadPanel.add(btnSubmitRequest);
 		return uploadPanel;
 	}//End createRequestPanel()
@@ -881,4 +921,5 @@ public class GUI extends JFrame {
 		return contactUsPanel;
 	}//End createContactUsPanel
 }
+
 
