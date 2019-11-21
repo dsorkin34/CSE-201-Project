@@ -78,8 +78,7 @@ public class LocalBookShelf implements BookShelf {
 			return false;
 		}
 		return true;
-	}
-	}// end createCSVFile
+	} // end createCSVFile
 	
 	@Override
 	public Book removeBook(String key) throws Exception {
