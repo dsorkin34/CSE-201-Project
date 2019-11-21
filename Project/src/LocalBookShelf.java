@@ -56,22 +56,29 @@ public class LocalBookShelf implements BookShelf {
 		}
 	} // end addFromCSV
 	
-	public void createCSVFile(String outputFile) throws IOException {
-		FileWriter csvWriter = new FileWriter(outputFile+".csv");
-		for(Book input: bookShelf) {
-			csvWriter.append(input.getISBN());
-			csvWriter.append(",");
-			csvWriter.append(input.getTitle());
-			csvWriter.append(",");
-			csvWriter.append(input.getAuthor());
-			csvWriter.append(",");
-			csvWriter.append(input.getDescription());
-			csvWriter.append(",");
-			csvWriter.append(input.getGenre());
-			csvWriter.append("\n");
+	public boolean createCSVFile(String outputFile) {
+		try {
+			FileWriter csvWriter = new FileWriter(outputFile+".csv");
+			for(Book input: bookShelf) {
+				csvWriter.append(input.getISBN());
+				csvWriter.append(",");
+				csvWriter.append(input.getTitle());
+				csvWriter.append(",");
+				csvWriter.append(input.getAuthor());
+				csvWriter.append(",");
+				csvWriter.append(input.getDescription());
+				csvWriter.append(",");
+				csvWriter.append(input.getGenre());
+				csvWriter.append("\n");
+				csvWriter.flush();
+				csvWriter.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
 		}
-		csvWriter.flush();
-		csvWriter.close();
+		return true;
+	}
 	}// end createCSVFile
 	
 	@Override
