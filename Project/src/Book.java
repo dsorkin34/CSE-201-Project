@@ -1,5 +1,6 @@
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 /*
  * Author: Nuo XU
@@ -20,7 +21,7 @@ public class Book {
 	private String genre; // The genre of the book
 	private double rating; // The average rating score based on a 0 to 5 scale
 	private int numOfRating; // The number of ratings
-	private HashMap<String, String> comments; // HashMap of <userName, comment> pairs
+	private Hashtable<String, String> comments; // Hashtable of <userName, comment> pairs
 
 	// ======================= Constructor
 	/**
@@ -43,7 +44,7 @@ public class Book {
 		this.genre = genre;
 		this.rating = 0;
 		this.numOfRating = 0;
-		this.comments = new HashMap<>();
+		this.comments = new Hashtable<>();
 	} // end constructor
 
 	// ======================= Method
@@ -224,8 +225,9 @@ public class Book {
 	
 	/**
 	 * Add a new rating to the overall rating
+	 * DO NOT USE THIS IN SQL BOOKSHELF
 	 * 
-	 * @param newRating genre of a Book
+	 * @param newRating the new user rating of a Book
 	 * @return True if successful, else if
 	 */
 	public boolean addRating(double newRating) {
@@ -234,9 +236,18 @@ public class Book {
 		return true;
 	} // end addRating
 
-	
+	/**
+	 * Set the overall rating
+	 * 
+	 * @param score the average score of a Book
+	 */
+	public void setRating(double score){
+		this.rating = score;
+	}
+
 	/**
 	 * Get the copy of HashMap of comments of a Book object
+	 * DO NOT USE THIS IN SQL BOOKSHELF
 	 * 
 	 * @return The HashMap of comments
 	 */
@@ -248,6 +259,7 @@ public class Book {
 	
 	/**
 	 * Add a new comment to the HashMao of comments
+	 * DO NOT USE THIS IN SQL BOOKSHELF
 	 * 
 	 * @param userName userName of the commenter
 	 * @param content the content of the comment
@@ -255,6 +267,17 @@ public class Book {
 	 */
 	public boolean addComment(String userName, String content) {
 		comments.put(userName, content);
+		return true;
+	} // end addComment
+
+	/**
+	 * Set the comment to the Hashtable of comments
+	 * 
+	 * @param h the hashtable
+	 * @return True if successful, else false
+	 */
+	public boolean setComment(Hashtable<String, String> h) {
+		this.comments = h;
 		return true;
 	} // end addComment
 

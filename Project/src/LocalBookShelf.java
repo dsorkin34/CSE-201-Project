@@ -93,7 +93,7 @@ public class LocalBookShelf implements BookShelf {
 	
 	@Override
 	public Book getBook(String key) throws Exception {
-		ArrayList<Book> possibleBooks = searchBook(SearchingField.TITLE, key, SortingCriteria.AUTHOR);
+		ArrayList<Book> possibleBooks = searchBook(SearchingField.ISBN, key, SortingCriteria.AUTHOR);
 		if (possibleBooks.size() == 0) {
 			System.out.println("Book not found");
 			return null;
