@@ -1,7 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.sql.*; // Using 'Connection', 'Statement' and 'ResultSet' classes in java.sql package
 
@@ -121,9 +121,6 @@ public class SQLBookShelf implements BookShelf {
 	public ArrayList<Book> searchBook(SearchingField field, String keyword, SortingCriteria sortBy) {
 		ArrayList<Book> ret = new ArrayList<>();
 		String queryStatement = "";
-		if (keyword.length() != 0) {
-			keyword = " " + keyword + " ";
-		} // end if
 
 		if (field.equals(SearchingField.ALL)) {
 			queryStatement = String.format(
@@ -337,8 +334,8 @@ public class SQLBookShelf implements BookShelf {
 	 * @param ISBN        the ISBN of the rated book
 	 * @return The hashtable of a UID-comment pair, where UID is the key
 	 */
-	public Hashtable<String, String> getAllComment(String ISBN) {
-		Hashtable<String, String> ret = new Hashtable<>();
+	public HashMap<String, String> getAllComment(String ISBN) {
+		HashMap<String, String> ret = new Hashtable<>();
 		try (Statement statement = connection.createStatement()) {
 			ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM comments WHERE ISBN = \"%s\";", ISBN));
 			if (!resultSet.next()) {
