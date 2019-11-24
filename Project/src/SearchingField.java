@@ -7,7 +7,7 @@ public enum SearchingField {
 	// Elements
 	ISBN("ISBN"),
 	TITLE("title"), 
-	AUTHOR("author"),
+	AUTHOR("lname"),
 	DISCRIPTION("discription"),
 	GENRE("genre"),
 	ALL("all");
