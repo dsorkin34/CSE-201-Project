@@ -15,17 +15,17 @@ import java.awt.event.ActionEvent;
  * It creates a Single Page Application, and takes in User Input to help
  * catalog Books, submitted by the User
  * @author Spencer Penrod
- *
  */
 public class GUI extends JFrame {
 	
 	//These are the multiple Databases that are used in the Program to store, and to add books, and users 
-	private static LocalBookShelf shelf;
+	private static SQLBookShelf shelf;
 	private static ArrayList<Book> queueShelf;
 	private static HashMap<String, String> community;
 	//These statements are used to allow access to users who are logged in or Admins
 	private static boolean loggedIn = false;
 	private static boolean isAdmin = false;
+	private static String UserID;
 	//The Description Panes are used here to be able to change on command
 	private static JScrollPane descriptionScrollPanel;
 	private static JScrollPane scrollPane;
@@ -38,7 +38,7 @@ public class GUI extends JFrame {
 	 * Initiates the GUI
 	 */
 	public static void main(String[] args) {
-		shelf = new LocalBookShelf();
+		shelf = new SQLBookShelf();
 		queueShelf = new ArrayList<Book>();
 		community = new HashMap<String, String>();
 		EventQueue.invokeLater(new Runnable() {
@@ -96,8 +96,7 @@ public class GUI extends JFrame {
 		btnHome.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.TITLE);
-				createBookViewSection(shelf.getBookShelf());
+				createBookViewSection(shelf.searchBook(SearchingField.TITLE,"",SortingCriteria.TITLE));
 				cl_mainPane.first(mainPane);
 			}
 		});
@@ -111,7 +110,6 @@ public class GUI extends JFrame {
 		JButton btnContactUs = new JButton("Contact Us");
 		btnContactUs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//cl_mainPane.show(mainPane, "contactUsPanel");
 				cl_mainPane.show(mainPane, "contactUsPanel");
 			}
 		});
@@ -168,9 +166,7 @@ public class GUI extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				if(!(txtSearch.getText().equals("")||txtSearch.getText().equals("Search Books"))){
 				cl_mainPane.show(mainPane, "homePanel");
-				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.TITLE);
-				createBookViewSection(shelf.getBookShelf());
-				
+				createBookViewSection(shelf.searchBook(SearchingField.TITLE,txtSearch.getText(),SortingCriteria.TITLE));
 				}
 				txtSearch.setText("Search Books");
 			}
@@ -194,6 +190,20 @@ public class GUI extends JFrame {
 		btnBookRequests.setForeground(Color.WHITE);
 		contentPane.add(btnBookRequests);
 		btnBookRequests.setVisible(true);
+		
+	//Creates the JButton that will be used to access User Documentation
+		JButton btnFaqs = new JButton("FAQs");
+		btnFaqs.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				cl_mainPane.show(mainPane, "faqsPanel");
+			}
+		});
+		btnFaqs.setForeground(Color.WHITE);
+		btnFaqs.setBackground(Color.BLACK);
+		sl_contentPane.putConstraint(SpringLayout.NORTH, btnFaqs, 0, SpringLayout.NORTH, btnHome);
+		sl_contentPane.putConstraint(SpringLayout.WEST, btnFaqs, 6, SpringLayout.EAST, btnBookRequests);
+		contentPane.add(btnFaqs);
 		
 	//Creates the Main Pane that will hold all functions of the other JPanels, Simulating a Single Page Application
 		mainPane = new JPanel();
@@ -244,8 +254,7 @@ public class GUI extends JFrame {
 		sl_contentPane.putConstraint(SpringLayout.EAST, scrollPane, -26, SpringLayout.EAST, contentPane);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		shelf.sortBy(shelf.getBookShelf(),SortingCriteria.TITLE);
-		createBookViewSection(shelf.getBookShelf());
+		createBookViewSection(shelf.searchBook(SearchingField.TITLE,"",SortingCriteria.TITLE));
 		homePanel.add(scrollPane, "name_1458073958000");
 		
 	//Creates the panel for users to request uploads
@@ -279,6 +288,10 @@ public class GUI extends JFrame {
 		JPanel contactUsPanel = createContactUsPanel();
 		mainPane.add(contactUsPanel, "contactUsPanel");
 		
+	//Creates the Panel that shows the User Documentation for the User
+		JPanel faqsPanel = new JPanel();
+		faqsPanel.setBackground(Color.WHITE);
+		mainPane.add(faqsPanel, "faqsPanel");
 		
 		
 		
@@ -306,8 +319,7 @@ public class GUI extends JFrame {
 		author.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.AUTHOR);
-				createBookViewSection(shelf.getBookShelf());
+				createBookViewSection(shelf.searchBook(SearchingField.AUTHOR,"",SortingCriteria.AUTHOR));
 			}
 		});
 		author.setBackground(Color.WHITE);
@@ -319,8 +331,7 @@ public class GUI extends JFrame {
 		title.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.TITLE);
-				createBookViewSection(shelf.getBookShelf());
+				createBookViewSection(shelf.searchBook(SearchingField.TITLE,"",SortingCriteria.TITLE));
 			}
 		});
 		title.setBackground(Color.WHITE);
@@ -332,8 +343,7 @@ public class GUI extends JFrame {
 		genre.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				shelf.sortBy(shelf.getBookShelf(),SortingCriteria.GENRE);
-				createBookViewSection(shelf.getBookShelf());
+				createBookViewSection(shelf.searchBook(SearchingField.GENRE,"",SortingCriteria.GENRE));
 			}
 		});
 		genre.setBackground(Color.WHITE);
@@ -372,6 +382,7 @@ public class GUI extends JFrame {
 		}
 		scrollPane.setViewportView(menu);
 	}//End createBookViewSection
+	
 	/**
 	 * Creates the Panel that displays the Books waiting to be approved by the Admin 
 	 * @param books is an ArrayList of Book that need to be approved by the Admin
@@ -512,7 +523,7 @@ public class GUI extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				if(loggedIn) {
 					if(!(textPane.getText().equals("Add a Comment")||textPane.getText().equals(""))) {
-						book.addComment(textPane.getText());
+						shelf.addComment(book.getISBN(), UserID, textPane.getText());
 						commentsPanel.add(createCommentPanel(textPane.getText()));
 						textPane.setText("Add a Comment");
 					}
@@ -547,7 +558,7 @@ public class GUI extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				if(loggedIn) {
 					if(ratingcomboBox.getSelectedIndex()!=0) {
-					book.addRating(ratingcomboBox.getSelectedIndex());
+					shelf.addRating(book.getISBN(), UserID, ratingcomboBox.getSelectedIndex());
 					createDescriptionPanel(book);
 					}
 				}else {
@@ -569,18 +580,18 @@ public class GUI extends JFrame {
 		}
 		descriptionScrollPanel.setViewportView(descriptionPanelTest);
 	}//End createDescriptionPanel
+	
 	/**
-	 * 
-	 * @param comments is the comments that are currently saved for a given Book
+	 * @param hashMap is the comments that are currently saved for a given Book
 	 * @return commentsPanels is the comments Strings converted into JPanels to be displayed in Book Descriptions
 	 */
-	private static ArrayList<JPanel> createStartCommentPanel(ArrayList<String> comments) {
+	private static ArrayList<JPanel> createStartCommentPanel(HashMap<String, String> hashMap) {
 		ArrayList<JPanel> commentsPanels = new ArrayList<JPanel>();
-		for(int i=0;i<comments.size();i++) {
-			commentsPanels.add(createCommentPanel(comments.get(i)));
-		}
+		for(String a: hashMap.values())
+			commentsPanels.add(createCommentPanel(a));
 		return commentsPanels;
-	}
+	}//End createStartCommentPanel
+	
 	/**
 	 * 
 	 * @param Comment is the Comment that will be Used to create the Panel displaying the Comment
@@ -632,10 +643,12 @@ public class GUI extends JFrame {
 					if(userName.getText().equals("Admin")&&password.getText().equals("AdminPassword")) {
 						loggedIn = true;
 						isAdmin = true;
+						UserID = "Admin";
 						btnLoginRegister.setText("LogOff Admin");
 						logInFrame.dispose();
 					}else if(community.containsKey(userName.getText())&&community.containsValue(password.getText())) {
 						loggedIn = true;
+						UserID = userName.getText();
 						btnLoginRegister.setText("LogOff "+userName.getText());
 						logInFrame.dispose();
 					}else {
@@ -658,6 +671,7 @@ public class GUI extends JFrame {
 						User newUser = new User(userName.getText(),password.getText());
 						community.put(newUser.getName(), newUser.getPassword());
 						loggedIn = true;
+						UserID = userName.getText();
 						btnLoginRegister.setText("LogOff "+userName.getText());
 						logInFrame.dispose();
 						
@@ -921,5 +935,3 @@ public class GUI extends JFrame {
 		return contactUsPanel;
 	}//End createContactUsPanel
 }
-
-
