@@ -110,7 +110,6 @@ public class GUI extends JFrame {
 		JButton btnContactUs = new JButton("Contact Us");
 		btnContactUs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//cl_mainPane.show(mainPane, "contactUsPanel");
 				cl_mainPane.show(mainPane, "contactUsPanel");
 			}
 		});
@@ -191,6 +190,20 @@ public class GUI extends JFrame {
 		btnBookRequests.setForeground(Color.WHITE);
 		contentPane.add(btnBookRequests);
 		btnBookRequests.setVisible(true);
+		
+	//Creates the JButton that will be used to access User Documentation
+		JButton btnFaqs = new JButton("FAQs");
+		btnFaqs.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				cl_mainPane.show(mainPane, "faqsPanel");
+			}
+		});
+		btnFaqs.setForeground(Color.WHITE);
+		btnFaqs.setBackground(Color.BLACK);
+		sl_contentPane.putConstraint(SpringLayout.NORTH, btnFaqs, 0, SpringLayout.NORTH, btnHome);
+		sl_contentPane.putConstraint(SpringLayout.WEST, btnFaqs, 6, SpringLayout.EAST, btnBookRequests);
+		contentPane.add(btnFaqs);
 		
 	//Creates the Main Pane that will hold all functions of the other JPanels, Simulating a Single Page Application
 		mainPane = new JPanel();
@@ -275,8 +288,9 @@ public class GUI extends JFrame {
 		JPanel contactUsPanel = createContactUsPanel();
 		mainPane.add(contactUsPanel, "contactUsPanel");
 		
-		
-		
+	//Creates the Panel that shows the User Documentation for the User
+		JPanel faqsPanel = createFAQsPanel();
+		mainPane.add(faqsPanel, "faqsPanel");
 		
 	}//End Constructor
 	
@@ -365,6 +379,7 @@ public class GUI extends JFrame {
 		}
 		scrollPane.setViewportView(menu);
 	}//End createBookViewSection
+	
 	/**
 	 * Creates the Panel that displays the Books waiting to be approved by the Admin 
 	 * @param books is an ArrayList of Book that need to be approved by the Admin
@@ -562,8 +577,8 @@ public class GUI extends JFrame {
 		}
 		descriptionScrollPanel.setViewportView(descriptionPanelTest);
 	}//End createDescriptionPanel
+	
 	/**
-	 * 
 	 * @param hashMap is the comments that are currently saved for a given Book
 	 * @return commentsPanels is the comments Strings converted into JPanels to be displayed in Book Descriptions
 	 */
@@ -572,7 +587,8 @@ public class GUI extends JFrame {
 		for(String a: hashMap.values())
 			commentsPanels.add(createCommentPanel(a));
 		return commentsPanels;
-	}
+	}//End createStartCommentPanel
+	
 	/**
 	 * 
 	 * @param Comment is the Comment that will be Used to create the Panel displaying the Comment
@@ -824,7 +840,111 @@ public class GUI extends JFrame {
 	}//End createRequestPanel()
 	
 	/**
-	 * Creates a Text Panel showing each of the Developers, their roles, and also the email address of each of the team members
+	 * Creates a Panel with text showing the User Documentation of the page. 
+	 * @return a formatted Panel with text for the Facts
+	 */
+	private JPanel createFAQsPanel() {
+		JPanel faqsPanel = new JPanel();
+		faqsPanel.setBackground(Color.WHITE);
+		SpringLayout sl_faqsPanel = new SpringLayout();
+		faqsPanel.setLayout(sl_faqsPanel);
+		
+		JLabel lblFAQ1 = new JLabel("Login");
+		lblFAQ1.setBackground(Color.WHITE);
+		lblFAQ1.setFont(new Font("Tahoma", Font.BOLD, 15));
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQ1, 10, SpringLayout.NORTH, faqsPanel);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQ1, 10, SpringLayout.WEST, faqsPanel);
+		faqsPanel.add(lblFAQ1);
+		
+		JLabel lblFAQAns1 = new JLabel("Users who already have an account may sign in to rate and comment on books");
+		lblFAQAns1.setBackground(Color.WHITE);
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns1, 6, SpringLayout.SOUTH, lblFAQ1);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns1, 10, SpringLayout.WEST, lblFAQ1);
+		faqsPanel.add(lblFAQAns1);
+		
+		JLabel lblFAQ2 = new JLabel("Register");
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQ2, 6, SpringLayout.SOUTH, lblFAQAns1);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQ2, 0, SpringLayout.WEST, lblFAQ1);
+		lblFAQ2.setFont(new Font("Tahoma", Font.BOLD, 15));
+		faqsPanel.add(lblFAQ2);
+		
+		JLabel lblFAQAns2 = new JLabel("Users may Register an account by typing in their requested username, and password and selecting the \"Register\" button");
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns2, 6, SpringLayout.SOUTH, lblFAQ2);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns2, 0, SpringLayout.WEST, lblFAQAns1);
+		faqsPanel.add(lblFAQAns2);
+		
+		JLabel lblFAQ3 = new JLabel("Leave A Comment (User Must Be Logged In)");
+		lblFAQ3.setFont(new Font("Tahoma", Font.BOLD, 15));
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQ3, 6, SpringLayout.SOUTH, lblFAQAns2);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQ3, 0, SpringLayout.WEST, lblFAQ1);
+		faqsPanel.add(lblFAQ3);
+		
+		JLabel lblFAQAns3 = new JLabel("Users may select a book, in which a comments section is displayed. \r\n");
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns3, 6, SpringLayout.SOUTH, lblFAQ3);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns3, 0, SpringLayout.WEST, lblFAQAns1);
+		faqsPanel.add(lblFAQAns3);
+		
+		JLabel lblFAQAns3_1 = new JLabel("Users may Type a comment into the textbox and select \"Submit Comment\" ");
+		lblFAQAns3_1.setBackground(Color.WHITE);
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns3_1, 6, SpringLayout.SOUTH, lblFAQAns3);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns3_1, 0, SpringLayout.WEST, lblFAQAns1);
+		faqsPanel.add(lblFAQAns3_1);
+		
+		JLabel lblFAQAns3_2 = new JLabel("The comment is then displayed in the comments section");
+		lblFAQAns3_2.setBackground(Color.WHITE);
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns3_2, 6, SpringLayout.SOUTH, lblFAQAns3_1);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns3_2, 0, SpringLayout.WEST, lblFAQAns1);
+		faqsPanel.add(lblFAQAns3_2);
+		
+		JLabel lblFAQ4 = new JLabel("Leave A Rating (User Must Be Logged In)");
+		lblFAQ4.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblFAQ4.setBackground(Color.WHITE);
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQ4, 6, SpringLayout.SOUTH, lblFAQAns3_2);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQ4, 0, SpringLayout.WEST, lblFAQ1);
+		faqsPanel.add(lblFAQ4);
+		
+		JLabel lblFAQAns4 = new JLabel("Users may select a book, in which a rating is displayed");
+		lblFAQAns4.setBackground(Color.WHITE);
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns4, 6, SpringLayout.SOUTH, lblFAQ4);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns4, 0, SpringLayout.WEST, lblFAQAns1);
+		faqsPanel.add(lblFAQAns4);
+		
+		JLabel lblFAQAns4_1 = new JLabel("Users may select a rating from the rating combo box, and click submit to submit a comment");
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns4_1, 6, SpringLayout.SOUTH, lblFAQAns4);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns4_1, 0, SpringLayout.WEST, lblFAQAns1);
+		lblFAQAns4_1.setBackground(Color.WHITE);
+		faqsPanel.add(lblFAQAns4_1);
+		
+		JLabel lblFAQ5 = new JLabel("Request An Upload (User Must Be Logged In)");
+		lblFAQ5.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblFAQ5.setBackground(Color.WHITE);
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQ5, 6, SpringLayout.SOUTH, lblFAQAns4_1);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQ5, 0, SpringLayout.WEST, lblFAQ1);
+		faqsPanel.add(lblFAQ5);
+		
+		JLabel lblFAQAns5 = new JLabel("Users can select the Request An Upload Button");
+		lblFAQAns5.setBackground(Color.WHITE);
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns5, 6, SpringLayout.SOUTH, lblFAQ5);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns5, 0, SpringLayout.WEST, lblFAQAns1);
+		faqsPanel.add(lblFAQAns5);
+		
+		JLabel lblFAQAns5_1 = new JLabel("All the textfields must be completed for a book to be requested");
+		lblFAQAns5_1.setBackground(Color.WHITE);
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns5_1, 6, SpringLayout.SOUTH, lblFAQAns5);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns5_1, 0, SpringLayout.WEST, lblFAQAns1);
+		faqsPanel.add(lblFAQAns5_1);
+		
+		JLabel lblFAQAns5_2 = new JLabel("User then presses \"Submit Request\" button and the Book is uploaded to be reviewed for approval by an admin");
+		lblFAQAns5_2.setBackground(Color.WHITE);
+		sl_faqsPanel.putConstraint(SpringLayout.NORTH, lblFAQAns5_2, 6, SpringLayout.SOUTH, lblFAQAns5_1);
+		sl_faqsPanel.putConstraint(SpringLayout.WEST, lblFAQAns5_2, 0, SpringLayout.WEST, lblFAQAns1);
+		faqsPanel.add(lblFAQAns5_2);
+		return faqsPanel;
+		
+	}// End createFaqsPanel
+	
+	/**
+	 * Creates a Panel with text showing each of the Developers, their roles, and also the email address of each of the team members
 	 * @return the JPanel used to create the contact Panel
 	 */	
 	private JPanel createContactUsPanel() {
@@ -916,3 +1036,4 @@ public class GUI extends JFrame {
 		return contactUsPanel;
 	}//End createContactUsPanel
 }
+
